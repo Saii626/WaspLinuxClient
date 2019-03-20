@@ -1,6 +1,6 @@
 package ConfigurationManagement;
 
-public interface OnConfigurationChange {
+public interface OnConfigurationChange<T> {
 
-    void onConfigurationChange(String oldVal, String newVal);
+    void onConfigurationChange(T oldVal, T newVal);
 }

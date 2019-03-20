@@ -2,7 +2,7 @@ package MainApplication;
 
 import CommandLineArgsParser.CommandLineParser;
 import ConfigurationManagement.ConfigKey;
-import ConfigurationManagement.ConfigurationManager;
+import ConfigurationManagement.ConfigManager;
 import Resources.Resources;
 import SocketManagement.WaspberrySocketManager;
 import com.sun.jna.Library;
@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
 public class MainApplication {
     public static MainApplication instance;
 
-    private ConfigurationManager configurationManager;
+    private ConfigManager configManager;
     private final File configFile = new File(Resources.CONFIG_FILE);
     private final int port = Resources.PORT;
     private Logger logger = LoggerFactory.getLogger(MainApplication.class.getSimpleName());
@@ -31,22 +31,22 @@ public class MainApplication {
     public MainApplication(String[] args) throws IOException, URISyntaxException {
         MainApplication.instance = this;
 
-        configurationManager = new ConfigurationManager(configFile);
+        configManager = new ConfigManager(configFile);
 
-        if (configurationManager.get(ConfigKey.PID).isPresent()) {
+        if (configManager.get(ConfigKey.PID).isPresent()) {
             logger.debug("An instance is already running");
-//            sendDataToAlreadyRunningInstance(Integer.parseInt(configurationManager.get(ConfigKey.PID).get()), args);
+//            sendDataToAlreadyRunningInstance(Integer.parseInt(configManager.get(ConfigKey.PID).get()), args);
             logger.debug("Exiting....");
             System.exit(0);
         } else {
             logger.debug("Instance started. Running with pid: {}", CLibrary.INSTANCE.getpid());
-            configurationManager.put(ConfigKey.PID, String.valueOf(CLibrary.INSTANCE.getpid()));
-            configurationManager.syncConfigurationFile();
+            configManager.put(ConfigKey.PID, String.valueOf(CLibrary.INSTANCE.getpid()));
+            configManager.syncConfigurationFile();
             logger.debug("Adding shutdown hook");
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
-                    configurationManager.put(ConfigKey.PID);
-                    configurationManager.syncConfigurationFile();
+                    configManager.put(ConfigKey.PID);
+                    configManager.syncConfigurationFile();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -89,7 +89,7 @@ public class MainApplication {
         commandLineParser.getAllArguments().forEach(entry -> {
             ConfigKey key = commandLineParser.getConfigKey(entry.getKey());
             logger.debug("Updating \t{}:\t{}", key.getKey(), entry.getValue());
-            configurationManager.put(key, entry.getValue());
+            configManager.put(key, entry.getValue());
         });
     }
 
@@ -108,7 +108,7 @@ public class MainApplication {
         }
     }
 
-    public ConfigurationManager getConfigurationManager() {
-        return configurationManager;
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 }

@@ -1,7 +1,7 @@
 package URLs;
 
 import ConfigurationManagement.ConfigKey;
-import ConfigurationManagement.ConfigurationManager;
+import ConfigurationManagement.ConfigManager;
 import MainApplication.MainApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ public enum Url {
     private String url;
 
     private static BaseUrl base_url = BaseUrl.REMOTE;
-    private static ConfigurationManager configurationManager = MainApplication.instance.getConfigurationManager();
+    private static ConfigManager configManager = MainApplication.instance.getConfigManager();
     private static Logger logger = LoggerFactory.getLogger(Url.class.getSimpleName());
 
     private static void changeBaseUrl(BaseUrl base_url) {
@@ -24,12 +24,12 @@ public enum Url {
 
     static {
         try {
-            String baseurl = configurationManager.get(ConfigKey.BASE_URL)
+            String baseurl = configManager.get(ConfigKey.BASE_URL)
                     .orElseThrow(() -> new BaseUrlNotConfigured("Base url is not set in config file"));
 
             changeBaseUrl(BaseUrl.valueOf(baseurl));
 
-            configurationManager.addOnConfigurationChangeListener(ConfigKey.BASE_URL, (oldVal , newVal) -> changeBaseUrl(BaseUrl.valueOf(newVal)));
+            configManager.addOnConfigurationChangeListener(ConfigKey.BASE_URL, (oldVal , newVal) -> changeBaseUrl(BaseUrl.valueOf(newVal)));
         } catch (BaseUrlNotConfigured e) {
             e.printStackTrace();
         }
