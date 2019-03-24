@@ -21,15 +21,20 @@ public class WaspberryMessageHandler {
     public void handleMessage(String message) {
 
         WaspberryMessage waspberryMessage = gson.fromJson(message, WaspberryMessage.class);
-        Class payloadClass = waspberryMessage.getType();
 
-        MessageModel messageModel = (MessageModel) gson.fromJson(waspberryMessage.getPayload(), payloadClass);
+        if (waspberryMessage != null) {
+            Class payloadClass = waspberryMessage.getType();
 
-        for (MessageHandler handler : messageHandlers) {
-            if (handler.handlesMessageOfType().equals(payloadClass)) {
-                logger.debug("Found {} for handling message", handler.getClass().getSimpleName());
-                handler.onMessage(messageModel);
+            MessageModel messageModel = (MessageModel) gson.fromJson(waspberryMessage.getPayload(), payloadClass);
+
+            for (MessageHandler handler : messageHandlers) {
+                if (handler.handlesMessageOfType().equals(payloadClass)) {
+                    logger.debug("Found {} for handling message", handler.getClass().getSimpleName());
+                    handler.onMessage(messageModel);
+                }
             }
+        } else {
+            logger.error("Unable to convert from JSON. No such message model found. Skipping");
         }
     }
 }
