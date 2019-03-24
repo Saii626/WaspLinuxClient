@@ -1,13 +1,19 @@
 package SocketManagement.Websocket;
 
-import SocketManagement.Websocket.OnWebsocketCloseListener;
-import SocketManagement.Websocket.OnWebsocketMessageListener;
-import SocketManagement.Websocket.OnWebsocketOpenListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.websocket.*;
+import javax.websocket.ClientEndpoint;
+import javax.websocket.CloseReason;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;

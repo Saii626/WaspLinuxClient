@@ -1,5 +1,6 @@
 package URLs;
 
+import ConfigurationManagement.MissingConfigurationValue;
 import ConfigurationManagement.ConfigKey;
 import ConfigurationManagement.ConfigurationManager;
 import ConfigurationManagement.SerializerDeserializerClassMismatchException;
@@ -7,12 +8,12 @@ import MainApplication.MainApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import java.util.Optional;
 
 public enum Url {
 
     SOCKET("/socket"),
-    TEST_DEVICE("/socket/test");
+    DEVICE("/socket/test");
 
     private String url;
 
@@ -29,14 +30,22 @@ public enum Url {
     static {
         try {
             String baseurl = configurationManager.get(ConfigKey.BASE_URL, String.class)
-                    .orElseThrow(() -> new BaseUrlNotConfigured("Base url is not set in config file"));
+                    .orElseThrow(() -> new MissingConfigurationValue(ConfigKey.BASE_URL));
 
             changeBaseUrl(BaseUrl.valueOf(baseurl));
 
             configurationManager.addOnConfigurationChangeListener(ConfigKey.BASE_URL, String.class,
                     (oldVal , newVal) -> changeBaseUrl(BaseUrl.valueOf(newVal)));
 
-        } catch (BaseUrlNotConfigured | SerializerDeserializerClassMismatchException e) {
+            Optional<String> deviceName = configurationManager.get(ConfigKey.DEVICE_NAME, String.class);
+            if (deviceName.isPresent()) {
+                DEVICE.url = "/socket/".concat(deviceName.get());
+                logger.debug("Setting device name to {}", deviceName.get());
+            } else {
+                logger.warn("No device name set in configuration file. Might be an error");
+            }
+
+        } catch (MissingConfigurationValue | SerializerDeserializerClassMismatchException e) {
             e.printStackTrace();
         }
     }

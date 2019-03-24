@@ -14,7 +14,6 @@ public class WaspberryMessageHandler {
 
 
     WaspberryMessageHandler(Gson gson, List<MessageHandler> handlers) {
-        logger.debug("Initializing WaspberryMessageHandler");
         this.gson = gson;
         this.messageHandlers = handlers;
     }
