@@ -3,7 +3,6 @@ package ConfigurationManagement.impl.ConfigFile;
 import ConfigurationManagement.ConfigKey;
 import ConfigurationManagement.ConfigurationFileManager;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +48,7 @@ public class ConfigurationFileManagerImpl implements ConfigurationFileManager {
 
         FileWriter fw = new FileWriter(configFile, false);
         fw.write(jsonConfig);
+        fw.write('\n');
         fw.close();
     }
 

@@ -24,7 +24,7 @@ public class WaspberryWebsocketModule {
     @WaspberryWebsocketScope
     static URI getUri() {
         try {
-            return new URI(Url.TEST_DEVICE.getUrl());
+            return new URI(Url.DEVICE.getUrl());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

@@ -1,10 +1,13 @@
 package MainApplication;
 
-import ConfigurationManagement.*;
+import ConfigurationManagement.ConfigKey;
+import ConfigurationManagement.ConfigurationManager;
+import ConfigurationManagement.ConfigurationManagerComponent;
+import ConfigurationManagement.DaggerConfigurationManagerComponent;
+import ConfigurationManagement.SerializerDeserializerClassMismatchException;
 import Resources.Resources;
 import SocketManagement.WaspberryWebsocket.DaggerWaspberryWebsocketComponent;
 import SocketManagement.WaspberryWebsocket.WaspberrySocketManager;
-import SocketManagement.WaspberryWebsocket.impl.WaspberrySocketManagerImpl;
 import SocketManagement.WaspberryWebsocket.WaspberryWebsocketComponent;
 import com.sun.jna.Library;
 import com.sun.jna.Native;

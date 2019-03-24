@@ -5,30 +5,15 @@ import ConfigurationManagement.impl.ConfigFile.ConfigFileModule_GetConfigGsonFac
 import ConfigurationManagement.impl.ConfigFile.ConfigFileModule_GetFileManagerFactory;
 import ConfigurationManagement.impl.ConfigManager.ConfigManagerModule;
 import ConfigurationManagement.impl.ConfigManager.ConfigManagerModule_GetConfigManagerFactory;
-import com.google.gson.Gson;
-import dagger.internal.DoubleCheck;
 import dagger.internal.Preconditions;
-import java.io.File;
 import javax.annotation.Generated;
-import javax.inject.Provider;
 
 @Generated(
   value = "dagger.internal.codegen.ComponentProcessor",
   comments = "https://google.github.io/dagger"
 )
 public final class DaggerConfigurationManagerComponent implements ConfigurationManagerComponent {
-  private Provider<File> configFileProvider;
-
-  private Provider<Gson> getConfigGsonProvider;
-
-  private Provider<ConfigurationFileManager> getFileManagerProvider;
-
-  private Provider<ConfigurationManager> getConfigManagerProvider;
-
-  private DaggerConfigurationManagerComponent() {
-
-    initialize();
-  }
+  private DaggerConfigurationManagerComponent() {}
 
   public static Builder builder() {
     return new Builder();
@@ -38,29 +23,17 @@ public final class DaggerConfigurationManagerComponent implements ConfigurationM
     return new Builder().build();
   }
 
-  @SuppressWarnings("unchecked")
-  private void initialize() {
-    this.configFileProvider =
-        DoubleCheck.provider(ConfigurationManagerModule_ConfigFileFactory.create());
-    this.getConfigGsonProvider =
-        DoubleCheck.provider(ConfigFileModule_GetConfigGsonFactory.create());
-    this.getFileManagerProvider =
-        DoubleCheck.provider(
-            ConfigFileModule_GetFileManagerFactory.create(
-                configFileProvider, getConfigGsonProvider));
-    this.getConfigManagerProvider =
-        DoubleCheck.provider(
-            ConfigManagerModule_GetConfigManagerFactory.create(getFileManagerProvider));
-  }
-
   @Override
   public ConfigurationManager getConfigurationManager() {
-    return getConfigManagerProvider.get();
+    return ConfigManagerModule_GetConfigManagerFactory.proxyGetConfigManager(
+        getConfigFileManager());
   }
 
   @Override
   public ConfigurationFileManager getConfigFileManager() {
-    return getFileManagerProvider.get();
+    return ConfigFileModule_GetFileManagerFactory.proxyGetFileManager(
+        ConfigurationManagerModule_ConfigFileFactory.proxyConfigFile(),
+        ConfigFileModule_GetConfigGsonFactory.proxyGetConfigGson());
   }
 
   public static final class Builder {

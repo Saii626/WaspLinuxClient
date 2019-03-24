@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 public enum ConfigKey {
     PID("pid", Integer.class, null),
-    BASE_URL("base_url", String.class, "REMOTE");
+    BASE_URL("base_url", String.class, "REMOTE"),
+    DEVICE_NAME("device_name", String.class, "test");
 
     private String key;
     private Class serializer;
