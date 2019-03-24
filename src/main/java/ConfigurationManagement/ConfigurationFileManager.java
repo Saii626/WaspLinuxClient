@@ -1,10 +1,12 @@
 package ConfigurationManagement;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public interface ConfigurationFileManager {
 
-    void createDefaultConfigFile();
-    Map<ConfigKey, ConfigurationModel> ingestConfigurationFile();
-    void updateConfigurationFile(Map<ConfigKey, ConfigurationModel> configurations);
+    Map<ConfigKey, Object> getConfigurations() throws IOException;
+
+    void sync() throws IOException;
 }

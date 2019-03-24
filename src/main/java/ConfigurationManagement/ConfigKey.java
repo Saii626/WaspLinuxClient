@@ -1,15 +1,18 @@
 package ConfigurationManagement;
 
+import java.util.Arrays;
+
 public enum ConfigKey {
-    PID("pid", ""),
-    BASE_URL("base_url", "REMOTE"),
-    TEST("test", "tttt");
+    PID("pid", Integer.class, null),
+    BASE_URL("base_url", String.class, "REMOTE");
 
     private String key;
-    private String default_value;
+    private Class serializer;
+    private Object default_value;
 
-    ConfigKey(String key, String default_value) {
+    ConfigKey(String key, Class serializer, Object default_value) {
         this.key = key;
+        this.serializer = serializer;
         this.default_value = default_value;
     }
 
@@ -17,7 +20,16 @@ public enum ConfigKey {
         return key;
     }
 
-    public String getDefaultValue() {
-        return default_value;
+    public Class getSerializer() {
+        return serializer;
+    }
+
+    public <T> T getDefaultValue() {
+        return (T) default_value;
+    }
+
+    public static ConfigKey getConfigKeyFromKey(String key) throws NoSuchConfigKeyFound {
+        return Arrays.stream(ConfigKey.values()).filter(configKey -> configKey.getKey().equals(key))
+                .findFirst().orElseThrow(() -> new NoSuchConfigKeyFound(String.format("No config with %s found", key)));
     }
 }

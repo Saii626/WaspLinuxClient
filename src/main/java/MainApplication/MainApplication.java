@@ -1,102 +1,80 @@
 package MainApplication;
 
-import CommandLineArgsParser.CommandLineParser;
-import ConfigurationManagement.ConfigKey;
-import ConfigurationManagement.ConfigManager;
+import ConfigurationManagement.*;
 import Resources.Resources;
-import SocketManagement.WaspberrySocketManager;
+import SocketManagement.WaspberryWebsocket.DaggerWaspberryWebsocketComponent;
+import SocketManagement.WaspberryWebsocket.WaspberrySocketManager;
+import SocketManagement.WaspberryWebsocket.impl.WaspberrySocketManagerImpl;
+import SocketManagement.WaspberryWebsocket.WaspberryWebsocketComponent;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class MainApplication {
-    public static MainApplication instance;
 
-    private ConfigManager configManager;
-    private final File configFile = new File(Resources.CONFIG_FILE);
+    private ConfigurationManager configurationManager;
+    private WaspberrySocketManager waspberrySocketManager;
+    private static MainApplication instance;
+
     private final int port = Resources.PORT;
     private Logger logger = LoggerFactory.getLogger(MainApplication.class.getSimpleName());
-
     private interface CLibrary extends Library {
-        CLibrary INSTANCE = (CLibrary) Native.load("c", CLibrary.class);
+        CLibrary INSTANCE = Native.load("c", CLibrary.class);
 
         int getpid();
     }
 
-    public MainApplication(String[] args) throws IOException, URISyntaxException {
-        MainApplication.instance = this;
+    public MainApplication(String[] args) throws IOException, SerializerDeserializerClassMismatchException {
+        // Don't change the order unless necessary
+        instance = this;
 
-        configManager = new ConfigManager(configFile);
+        ConfigurationManagerComponent configurationManagerComponent = DaggerConfigurationManagerComponent.builder()
+                .build();
+        configurationManager = configurationManagerComponent.getConfigurationManager();
 
-        if (configManager.get(ConfigKey.PID).isPresent()) {
+        WaspberryWebsocketComponent waspberryWebsocketComponent = DaggerWaspberryWebsocketComponent.builder()
+                .build();
+        waspberrySocketManager = waspberryWebsocketComponent.getSocketManager();
+
+        ApplicationComponent comp = DaggerApplicationComponent.builder()
+                .mainApplicationModule(new MainApplicationModule(this))
+                .waspberryWebsocketComponent(waspberryWebsocketComponent)
+                .configurationManagerComponent(configurationManagerComponent)
+                .build();
+        comp.inject(this);
+
+
+        if (configurationManager.get(ConfigKey.PID, Integer.class).isPresent()) {
             logger.debug("An instance is already running");
-//            sendDataToAlreadyRunningInstance(Integer.parseInt(configManager.get(ConfigKey.PID).get()), args);
             logger.debug("Exiting....");
             System.exit(0);
         } else {
             logger.debug("Instance started. Running with pid: {}", CLibrary.INSTANCE.getpid());
-            configManager.put(ConfigKey.PID, String.valueOf(CLibrary.INSTANCE.getpid()));
-            configManager.syncConfigurationFile();
+            configurationManager.put(ConfigKey.PID, Integer.class, CLibrary.INSTANCE.getpid());
+            configurationManager.sync();
             logger.debug("Adding shutdown hook");
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
-                    configManager.put(ConfigKey.PID);
-                    configManager.syncConfigurationFile();
+                    configurationManager.put(ConfigKey.PID);
+                    configurationManager.sync();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }));
-            updateConfigurations(args);
             startApplicationLoop();
         }
     }
 
-//    private static void sendDataToAlreadyRunningInstance(int pid, String[] args) throws IOException {
-//        StringBuilder commandStringBuilder = new StringBuilder();
-//
-//        for (String arg : args) {
-//            commandStringBuilder.append(arg.concat(" "));
-//        }
-//
-//        String commandString = commandStringBuilder.toString().trim();
-//        ByteBuffer br = ByteBuffer.wrap(commandString.getBytes());
-//
-//        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-//        serverSocketChannel.socket().bind(new InetSocketAddress(port));
-//        serverSocketChannel.configureBlocking(false);
-//        serverSocketChannel.register(Selector.open(), SelectionKey.OP_ACCEPT);
-//
-//        if (serverSocketChannel.isOpen()) {
-//                SocketChannel socketChannel = serverSocketChannel.accept();
-//                logger.debug("Opened socket connection to port: {}", port);
-//
-//                socketChannel.write(br);
-//                logger.debug("Sent \"{}\"", commandString);
-//                serverSocketChannel.close();
-//                logger.debug("Closed socket connection");
-//        }
-//    }
 
-    private void updateConfigurations(String[] args) {
-        logger.debug("Updating configurations");
-        CommandLineParser commandLineParser = new CommandLineParser(args);
 
-        commandLineParser.getAllArguments().forEach(entry -> {
-            ConfigKey key = commandLineParser.getConfigKey(entry.getKey());
-            logger.debug("Updating \t{}:\t{}", key.getKey(), entry.getValue());
-            configManager.put(key, entry.getValue());
-        });
-    }
 
     private void startApplicationLoop() {
         logger.debug("Starting application loop");
-//        setupSocketServer();
-        WaspberrySocketManager.connect();
+
+        waspberrySocketManager.connect();
 
         logger.debug("Infinity main loop");
         while (true) {
@@ -108,7 +86,11 @@ public class MainApplication {
         }
     }
 
-    public ConfigManager getConfigManager() {
-        return configManager;
+    public static ConfigurationManager getConfigurationManager() {
+        return instance.configurationManager;
+    }
+
+    public static WaspberrySocketManager getWaspberrySocketManager() {
+        return instance.waspberrySocketManager;
     }
 }
