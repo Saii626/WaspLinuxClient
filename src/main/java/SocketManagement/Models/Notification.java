@@ -1,6 +1,6 @@
-package SocketManagement.WaspberryMessageHandler.Models;
+package SocketManagement.Models;
 
-import SocketManagement.WaspberryMessageHandler.MessageModel;
+import WaspberrySocketManagement.WaspberryMessageHandler.MessageModel;
 import com.google.gson.annotations.SerializedName;
 
 import java.text.DateFormat;
@@ -38,5 +38,10 @@ public class Notification implements MessageModel {
                 "\ntitle:\t" + title +
                 "\nmessage:\t" + message;
 
+    }
+
+    @Override
+    public String modelName() {
+        return "Notification";
     }
 }

@@ -1,6 +1,5 @@
 package MainApplication;
 
-import SocketManagement.WaspberryWebsocket.WaspberryWebsocketComponent;
 import dagger.internal.DoubleCheck;
 import dagger.internal.Preconditions;
 import javax.annotation.Generated;
@@ -11,15 +10,11 @@ import javax.inject.Provider;
   comments = "https://google.github.io/dagger"
 )
 public final class DaggerApplicationComponent implements ApplicationComponent {
-  private final WaspberryWebsocketComponent waspberryWebsocketComponent;
-
   private Provider<MainApplication> getProvider;
 
-  private DaggerApplicationComponent(
-      MainApplicationModule mainApplicationModuleParam,
-      WaspberryWebsocketComponent waspberryWebsocketComponentParam) {
-    this.waspberryWebsocketComponent = waspberryWebsocketComponentParam;
-    initialize(mainApplicationModuleParam, waspberryWebsocketComponentParam);
+  private DaggerApplicationComponent(MainApplicationModule mainApplicationModuleParam) {
+
+    initialize(mainApplicationModuleParam);
   }
 
   public static Builder builder() {
@@ -27,20 +22,13 @@ public final class DaggerApplicationComponent implements ApplicationComponent {
   }
 
   @SuppressWarnings("unchecked")
-  private void initialize(
-      final MainApplicationModule mainApplicationModuleParam,
-      final WaspberryWebsocketComponent waspberryWebsocketComponentParam) {
+  private void initialize(final MainApplicationModule mainApplicationModuleParam) {
     this.getProvider =
         DoubleCheck.provider(MainApplicationModule_GetFactory.create(mainApplicationModuleParam));
   }
 
   @Override
   public void inject(MainApplication application) {}
-
-  @Override
-  public WaspberryWebsocketComponent getWebsocketComponent() {
-    return waspberryWebsocketComponent;
-  }
 
   @Override
   public MainApplication getMainApplication() {
@@ -50,8 +38,6 @@ public final class DaggerApplicationComponent implements ApplicationComponent {
   public static final class Builder {
     private MainApplicationModule mainApplicationModule;
 
-    private WaspberryWebsocketComponent waspberryWebsocketComponent;
-
     private Builder() {}
 
     public Builder mainApplicationModule(MainApplicationModule mainApplicationModule) {
@@ -59,17 +45,9 @@ public final class DaggerApplicationComponent implements ApplicationComponent {
       return this;
     }
 
-    public Builder waspberryWebsocketComponent(
-        WaspberryWebsocketComponent waspberryWebsocketComponent) {
-      this.waspberryWebsocketComponent = Preconditions.checkNotNull(waspberryWebsocketComponent);
-      return this;
-    }
-
     public ApplicationComponent build() {
       Preconditions.checkBuilderRequirement(mainApplicationModule, MainApplicationModule.class);
-      Preconditions.checkBuilderRequirement(
-          waspberryWebsocketComponent, WaspberryWebsocketComponent.class);
-      return new DaggerApplicationComponent(mainApplicationModule, waspberryWebsocketComponent);
+      return new DaggerApplicationComponent(mainApplicationModule);
     }
   }
 }
