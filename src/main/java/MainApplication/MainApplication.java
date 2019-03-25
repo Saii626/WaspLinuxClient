@@ -41,7 +41,6 @@ public class MainApplication {
 
         waspberrySocketManager = SocketManager.getSocketManager();
 
-
         if (configurationManager.get(ConfigKey.PID, Integer.class).isPresent()) {
             logger.debug("An instance is already running");
             logger.debug("Exiting....");
