@@ -1,0 +1,3 @@
+[submodule "ConfigurationManagement"]
+	path = ConfigurationManagement
+	url = git@github.com:Saii626/ConfigurationManagement.git

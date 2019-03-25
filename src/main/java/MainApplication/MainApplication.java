@@ -5,6 +5,7 @@ import ConfigurationManagement.ConfigurationManager;
 import ConfigurationManagement.ConfigurationManagerComponent;
 import ConfigurationManagement.DaggerConfigurationManagerComponent;
 import ConfigurationManagement.SerializerDeserializerClassMismatchException;
+import ConfigurationManagement.UnsatisfiedDependenciesModule;
 import Resources.Resources;
 import SocketManagement.WaspberryWebsocket.DaggerWaspberryWebsocketComponent;
 import SocketManagement.WaspberryWebsocket.WaspberrySocketManager;
@@ -35,6 +36,7 @@ public class MainApplication {
         instance = this;
 
         ConfigurationManagerComponent configurationManagerComponent = DaggerConfigurationManagerComponent.builder()
+                .unsatisfiedDependenciesModule(new UnsatisfiedDependenciesModule(Resources.CONFIG_FILE))
                 .build();
         configurationManager = configurationManagerComponent.getConfigurationManager();
 
@@ -45,7 +47,6 @@ public class MainApplication {
         ApplicationComponent comp = DaggerApplicationComponent.builder()
                 .mainApplicationModule(new MainApplicationModule(this))
                 .waspberryWebsocketComponent(waspberryWebsocketComponent)
-                .configurationManagerComponent(configurationManagerComponent)
                 .build();
         comp.inject(this);
 
