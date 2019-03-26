@@ -5,10 +5,10 @@ import ConfigurationManagement.ConfigurationManager;
 import ConfigurationManagement.ConfigurationManagerComponent;
 import ConfigurationManagement.DaggerConfigurationManagerComponent;
 import ConfigurationManagement.SerializerDeserializerClassMismatchException;
+import ConfigurationManagement.UnsatisfiedDependenciesModule;
 import Resources.Resources;
-import SocketManagement.WaspberryWebsocket.DaggerWaspberryWebsocketComponent;
-import SocketManagement.WaspberryWebsocket.WaspberrySocketManager;
-import SocketManagement.WaspberryWebsocket.WaspberryWebsocketComponent;
+import SocketManagement.SocketManager;
+import WaspberrySocketManagement.WaspberryWebsocket.WaspberrySocketManager;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import org.slf4j.Logger;
@@ -35,20 +35,11 @@ public class MainApplication {
         instance = this;
 
         ConfigurationManagerComponent configurationManagerComponent = DaggerConfigurationManagerComponent.builder()
+                .unsatisfiedDependenciesModule(new UnsatisfiedDependenciesModule(Resources.CONFIG_FILE))
                 .build();
         configurationManager = configurationManagerComponent.getConfigurationManager();
 
-        WaspberryWebsocketComponent waspberryWebsocketComponent = DaggerWaspberryWebsocketComponent.builder()
-                .build();
-        waspberrySocketManager = waspberryWebsocketComponent.getSocketManager();
-
-        ApplicationComponent comp = DaggerApplicationComponent.builder()
-                .mainApplicationModule(new MainApplicationModule(this))
-                .waspberryWebsocketComponent(waspberryWebsocketComponent)
-                .configurationManagerComponent(configurationManagerComponent)
-                .build();
-        comp.inject(this);
-
+        waspberrySocketManager = SocketManager.getSocketManager();
 
         if (configurationManager.get(ConfigKey.PID, Integer.class).isPresent()) {
             logger.debug("An instance is already running");

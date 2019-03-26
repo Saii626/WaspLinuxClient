@@ -1,0 +1,8 @@
+[submodule "ConfigurationManagement"]
+	path = ConfigurationManagement
+	url = git@github.com:Saii626/ConfigurationManagement.git
+	branch = master
+[submodule "WaspberryWebsocketManagement"]
+	path = WaspberryWebsocketManagement
+	url = git@github.com:Saii626/WaspberryWebsocketManagement.git
+	branch = master

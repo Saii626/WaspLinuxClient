@@ -1,8 +1,8 @@
-package SocketManagement.WaspberryMessageHandler.Handlers;
+package SocketManagement.Handlers;
 
 import Resources.Resources;
-import SocketManagement.WaspberryMessageHandler.MessageHandler;
-import SocketManagement.WaspberryMessageHandler.Models.Notification;
+import SocketManagement.Models.Notification;
+import WaspberrySocketManagement.WaspberryMessageHandler.MessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
